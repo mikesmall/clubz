@@ -5,8 +5,22 @@ class ClubsController < ApplicationController
   end
 
   def show
+
+    unless current_user
+      flash[:alert] = ["Must be logged in to enter club"]
+      redirect_to root_path
+    end#unless
+
     @club = Club.find(params[:id])
-  end
+
+    unless User::ALLOWED_ROLES.include?(current_user.role)
+      unless current_user.clubs.include?(@club)
+        flash[:alert] = ["You're not allowed here!"]
+        redirect_to root_path
+      end#unless
+    end#unless
+
+  end#def-show
 
   def new
     @club = Club.new
